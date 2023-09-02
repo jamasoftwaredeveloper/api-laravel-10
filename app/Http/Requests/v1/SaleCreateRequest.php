@@ -22,10 +22,14 @@ class SaleCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'number' => 'required|string|unique:sales',
-            'customer' => 'required|string',
-            'phone' => 'required|string|regex:/^[0-9]{9}$/',
-            'email' => 'required|string|email'
+
+            'products' => 'required|array', // 'products' debe ser un arreglo requerido
+            'products.*.id' => 'required|integer', // Cada elemento 'id' dentro de 'products' debe ser un entero
+            'products.*.quantity' => 'required|integer', // Cada elemento 'quantity' dentro de 'products' debe ser un entero
+            'sale.*.number' => 'required|string|unique:sales',
+            'sale.*.customer' => 'required|string',
+            'sale.*.phone' => 'required|string|regex:/^[0-9]{9}$/',
+            'sale.*.email' => 'required|string|email'
         ];
     }
 }

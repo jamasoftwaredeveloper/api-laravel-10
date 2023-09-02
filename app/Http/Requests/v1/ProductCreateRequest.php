@@ -22,7 +22,7 @@ class ProductCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string',
+            'name' => 'required|string|unique:products',
             'description' => 'required|string',
             'photo' => 'nullable|image',
             'price' => 'required|numeric|min:0',

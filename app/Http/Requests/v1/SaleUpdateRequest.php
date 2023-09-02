@@ -12,7 +12,7 @@ class SaleUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,12 +22,14 @@ class SaleUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Obtenemos el ID de la venta que se está actualizando desde la URL.
+        $saleId = $this->route('sale');
+
         return [
-            'number' => 'required|string|unique:sales',
+            'number' => 'required|string|unique:sales,number,' . $saleId,
             'customer' => 'required|string',
             'phone' => 'required|string|regex:/^[0-9]{9}$/',
-            'email' => 'required|string|email',
-            'products.*' => ['required', Rule::exists('products', 'id')],
+            'email' => 'required|string|email'
         ];
     }
 }

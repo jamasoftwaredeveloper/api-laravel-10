@@ -23,17 +23,17 @@ class Product extends Model
     public function toArray()
     {
         return [
-            'sku'=>$this->sku,
-            'name'=>$this->name,
-            'description'=>$this->description,
-            'photo'=>$this->photo,
-            'price'=>$this->price,
+            'sku' => $this->sku,
+            'name' => $this->name,
+            'description' => $this->description,
+            'photo' => $this->photo,
+            'price' => $this->price,
             'quantity' => $this->pivot->quantity,
-            'sub_total' =>($this->price + ($this->price * $this->iva/100)) * $this->pivot->quantity,
-            'iva'=>$this->iva,
-            'active'=>$this->active,
-            'created_at'=>$this->created_at,
-            'updated_at'=>$this->updated_at,
+            'sub_total' => ($this->price + ($this->price * $this->iva / 100)) * $this->pivot->quantity,
+            'iva' => $this->iva,
+            'active' => $this->active,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 
@@ -41,5 +41,15 @@ class Product extends Model
     {
         return $this->belongsToMany(Sale::class, 'products_sales')
             ->withPivot('quantity');
+    }
+
+    /**
+     * Comprueba si el producto está inactivo.
+     *
+     * @return bool
+     */
+    public function isInactive()
+    {
+        return $this->active === 0;
     }
 }

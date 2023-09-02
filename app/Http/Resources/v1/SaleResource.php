@@ -21,7 +21,7 @@ class SaleResource extends JsonResource
             'customer' => $this->customer,
             'phone' => $this->phone,
             'email' => $this->email,
-            'products' => $this->products,
+            'details' => $this->products,
             'total'=>$this->calculate_total_sale()
         ];
     }

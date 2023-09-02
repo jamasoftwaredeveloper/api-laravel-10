@@ -16,9 +16,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 Route::resource('products', ProductController::class);
 Route::resource('sales', SaleController::class);
 Route::put('products/{product}/inactiveOrActivate', 'App\Http\Controllers\v1\ProductController@inactiveOrActivate')
