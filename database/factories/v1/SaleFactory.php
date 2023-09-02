@@ -19,7 +19,7 @@ class SaleFactory extends Factory
     public function definition(): array
     {
         return [
-            'number' => $this->faker->unique()->randomNumber(),
+            'number' => $this->faker->unique()->numberBetween(1, 1000000),
             'customer' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
             'email' => $this->faker->email()
