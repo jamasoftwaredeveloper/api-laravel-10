@@ -13,7 +13,7 @@ trait GlobalTrait
      */
     private function handleException(\Exception $ex, $message = 'Algo salió mal')
     {
-        return response()->json(['error' => $message, 'details' => $ex->getMessage(),'line' =>$ex->getLine()], $ex->getCode());
+        return response()->json(['error' => $message, 'details' => $ex->getMessage(),'line' =>$ex->getLine()],404);
     }
 
 }

@@ -23,12 +23,15 @@ class SaleUpdateRequest extends FormRequest
     public function rules(): array
     {
         // Obtenemos el ID de la venta que se está actualizando desde la URL.
-        $saleId = $this->route('sale');
+        $saleId = $this->route('id');
 
         return [
+            'products' => 'required|array', // 'products' debe ser un arreglo requerido
+            'products.*.id' => 'required|integer', // Cada elemento 'id' dentro de 'products' debe ser un entero
+            'products.*.quantity' => 'required|integer|min:1', // Cada elemento 'quantity' dentro de 'products' debe ser un entero
             'number' => 'required|string|unique:sales,number,' . $saleId,
             'customer' => 'required|string',
-            'phone' => 'required|string|regex:/^[0-9]{9}$/',
+            'phone' => 'required|string',
             'email' => 'required|string|email'
         ];
     }

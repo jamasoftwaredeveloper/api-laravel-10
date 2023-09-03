@@ -77,7 +77,7 @@ class ProductController extends Controller
     try {
       $product = Product::find($id);
       if (!$product) {
-        return response()->json(['info' => "Aviso", 'message' => "Producto no exite"], 202);
+        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 202);
       }
       if ($product->isInactive()) {
         return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id, está inactivo"], 401);
@@ -96,13 +96,11 @@ class ProductController extends Controller
    */
   public function update(Request $request,  $id)
   {
-    return response()->json(['info' => "Aviso", 'message' => $request->all()], 200);
     $validatedData = $request->validated(); // Validar los datos utilizando la regla definida en ProductCreateRequest
-    return response()->json(['info' => "Aviso", 'message' => $validatedData['name']], 200);
     $product = Product::find($id);
     try {
       if (!$product) {
-        return response()->json(['info' => "Aviso", 'message' => "Producto no exite"], 202);
+        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 202);
       }
       if ($product->isInactive()) {
         return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id, está inactivo"], 401);
@@ -127,11 +125,11 @@ class ProductController extends Controller
       $product = Product::find($id);
 
       if (!$product) {
-        return response()->json(['info' => "Aviso", 'message' => "Producto no exite"], 202);
+        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 202);
       }
-      return response()->json(['info' => "Aviso", 'message' => $product], 202);
+      return response()->json(['info' => "Warning", 'message' => $product], 202);
       $product->delete();
-      return response()->json(['success' => "Éxito", 'message' => "Se ha elimando correctamente"], 200);
+      return response()->json(['success' => "Éxito", 'message' => "Successfully deleted"], 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
     }

@@ -10,6 +10,7 @@ use App\Http\Resources\v1\SaleResource;
 use App\Models\v1\Sale;
 use Illuminate\Http\Request;
 use App\Http\Traits\GlobalTrait;
+use App\Models\v1\ProductSale;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 
@@ -59,14 +60,18 @@ class SaleController extends Controller
     {
         DB::beginTransaction();
         try {
-            $validatedDataSale = $request->sale->validated()['sale'];
+            $validatedDataSale = $request->validated();
             $sale = Sale::create($validatedDataSale);
-            $validatedDataProduct = $request->products->validated()['products'];
+            $validatedDataProduct = $request->validated()['products'];
             foreach ($validatedDataProduct as $value) {
-                $sale->products()->attach($value);
+                $productSale = new ProductSale;
+                $productSale->product_id = $value['id'];
+                $productSale->sale_id = $sale->id;
+                $productSale->quantity = $value['quantity'];
+                $productSale->save();
             }
             DB::commit();
-            return response()->json(new SaleResource($sale));
+            return response()->json(new SaleResource($sale), 200);
         } catch (\Exception $ex) {
             DB::rollback();
             return $this->handleException($ex);
@@ -76,13 +81,17 @@ class SaleController extends Controller
     /**
      * Obtiene los detalles de una venta específica por su ID.
      *
-     * @param Sale $sale
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show(Sale $sale)
+    public function show($id)
     {
         try {
-            return response()->json(new SaleResource($sale));
+            $sale = Sale::find($id);
+            if (!$sale) {
+                return response()->json(['info' => "Warning", 'message' => "Sale does not exist"], 202);
+            }
+            return response()->json(new SaleResource($sale), 200);
         } catch (\Exception $ex) {
             return $this->handleException($ex);
         }
@@ -92,19 +101,27 @@ class SaleController extends Controller
      * Actualiza los detalles de una venta existente.
      *
      * @param SaleCreateRequest $request
-     * @param Sale $sale
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(SaleUpdateRequest $request, Sale $sale)
+    public function update(SaleUpdateRequest $request, $id)
     {
         DB::beginTransaction();
         try {
-            $validatedDataSale = $request->sale->validated()['sale'];
+            $sale = Sale::find($id);
+            if (!$sale) {
+                return response()->json(['info' => "Warning", 'message' => "Sale does not exist"], 202);
+            }
+            $validatedDataSale = $request->validated();
             $sale->update($validatedDataSale);
-            $validatedDataProduct = $request->products->validated()['products'];
+            $validatedDataProduct = $request->validated()['products'];
             $sale->products()->detach();
             foreach ($validatedDataProduct as $value) {
-                $sale->products()->attach($value);
+                $productSale = new ProductSale;
+                $productSale->product_id = $value['id'];
+                $productSale->sale_id = $sale->id;
+                $productSale->quantity = $value['quantity'];
+                $productSale->save();
             }
             DB::commit();
             return response()->json(new SaleResource($sale));
@@ -117,14 +134,19 @@ class SaleController extends Controller
     /**
      * Elimina una venta existente.
      *
-     * @param Sale $sale
+     * @param $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Sale $sale)
+    public function destroy($id)
     {
         try {
+            $sale = Sale::find($id);
+            if (!$sale) {
+                return response()->json(['info' => "Warning", 'message' => "Sale does not exist"], 202);
+            }
+            $sale->products()->detach();
             $sale->delete();
-            return response()->json(null, 204);
+            return response()->json(['success' => "Success", 'message' => "Successfully deleted"], 200);
         } catch (\Exception $ex) {
             return $this->handleException($ex);
         }

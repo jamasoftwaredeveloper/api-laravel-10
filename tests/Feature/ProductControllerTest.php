@@ -122,7 +122,7 @@ class ProductControllerTest extends TestCase
             'active' => true,
         ];
 
-        $response = $this->post("api/products/{$product->id}",$productUpdate);
+        $response = $this->put("api/products/{$product->id}",$productUpdate);
 
         $response
             ->assertStatus($response->getStatusCode() === 200 ? 200 : 202);
