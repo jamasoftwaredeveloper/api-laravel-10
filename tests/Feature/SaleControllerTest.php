@@ -16,8 +16,9 @@ class SaleControllerTest extends TestCase
 
     public function testIndex()
     {
+        $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'testsale1@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);
@@ -36,7 +37,7 @@ class SaleControllerTest extends TestCase
     {
         $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'test2@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);
@@ -85,7 +86,7 @@ class SaleControllerTest extends TestCase
     {
         $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'test2@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);
@@ -150,7 +151,7 @@ class SaleControllerTest extends TestCase
 
         $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'test2@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);
@@ -219,7 +220,7 @@ class SaleControllerTest extends TestCase
     {
         $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'test2@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);

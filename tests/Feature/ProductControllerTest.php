@@ -13,14 +13,13 @@ use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
 {
-    protected $token;
-    protected $user;
     use RefreshDatabase; // Reinicia la base de datos después de cada prueba
 
     public function testIndex()
     {
+        $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'test1@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);
@@ -39,7 +38,7 @@ class ProductControllerTest extends TestCase
     {
         $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'test2@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);
@@ -66,14 +65,14 @@ class ProductControllerTest extends TestCase
 
     public function testShow()
     {
+        $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'test3@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);
         // Crea un producto de ejemplo en la base de datos
 
-        $faker = Factory::create();
         $product = [
             'sku' => $faker->unique()->ean13(),
             'name' => $faker->unique()->name(),
@@ -93,14 +92,15 @@ class ProductControllerTest extends TestCase
 
     public function testUpdate()
     {
+        $faker = Factory::create();
+
         $user = User::factory()->create([
-            'email' => 'test4@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
 
         $this->actingAs($user);
 
-        $faker = Factory::create();
         $product = [
             'sku' => $faker->unique()->ean13(),
             'name' => $faker->unique()->name(),
@@ -130,8 +130,9 @@ class ProductControllerTest extends TestCase
 
     public function testDestroy()
     {
+        $faker = Factory::create();
         $user = User::factory()->create([
-            'email' => 'test5@gmail.com',
+            'email' => $faker->unique()->email(),
             'password' => '1234'
         ]);
         $this->actingAs($user);
