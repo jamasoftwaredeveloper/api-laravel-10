@@ -18,37 +18,65 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// Rutas protegidas por autenticación
+// Without authentication
+Route::prefix('v1')->group(function () {
+    // products
+    Route::get('products', 'App\Http\Controllers\v1\ProductController@index')
+        ->name('v1.products.index');
+    Route::get('products/{id}', 'App\Http\Controllers\v1\ProductController@show')
+        ->name('v1.products.show');
+    Route::post('products', 'App\Http\Controllers\v1\ProductController@store')
+        ->name('v1.products.store');
+    Route::put('products/{id}', 'App\Http\Controllers\v1\ProductController@update')
+        ->name('v1.products.update');
+    Route::delete('products/{id}', 'App\Http\Controllers\v1\ProductController@destroy')
+        ->name('v1.products.destroy');
+    Route::put('products/{product}/inactiveOrActivate', 'App\Http\Controllers\v1\ProductController@inactiveOrActivate')
+        ->name('v1.products.inactiveOrActivate');
+
+    //sales
+    Route::get('sales', 'App\Http\Controllers\v1\SaleController@index')
+        ->name('v1.sales.index');
+    Route::get('sales/{id}', 'App\Http\Controllers\v1\SaleController@show')
+        ->name('v1.sales.show');
+    Route::post('sales', 'App\Http\Controllers\v1\SaleController@store')
+        ->name('v1.sales.store');
+    Route::put('sales/{id}', 'App\Http\Controllers\v1\SaleController@update')
+        ->name('v1.sales.update');
+    Route::delete('sales/{id}', 'App\Http\Controllers\v1\SaleController@destroy')
+        ->name('v1.sales.destroy');
+});
 
 
+//Authentication sanctum
+Route::middleware(['auth:sanctum'])->prefix('v2')->group(function () {
 
-Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('user/profile', [AuthController::class, 'userProfile'])->name('userProfile');
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('user/profile', [AuthController::class, 'userProfile'])->name('userProfile');
+    // products
+    Route::get('products', 'App\Http\Controllers\v1\ProductController@index')
+        ->name('v2.products.index');
+    Route::get('products/{id}', 'App\Http\Controllers\v1\ProductController@show')
+        ->name('v2.products.show');
+    Route::post('products', 'App\Http\Controllers\v1\ProductController@store')
+        ->name('v2.products.store');
+    Route::put('products/{id}', 'App\Http\Controllers\v1\ProductController@update')
+        ->name('v2.products.update');
+    Route::delete('products/{id}', 'App\Http\Controllers\v1\ProductController@destroy')
+        ->name('v2.products.destroy');
+    Route::put('products/{product}/inactiveOrActivate', 'App\Http\Controllers\v1\ProductController@inactiveOrActivate')
+        ->name('v2.products.inactiveOrActivate');
 
-// products
-Route::middleware('auth:sanctum')->get('products', 'App\Http\Controllers\v1\ProductController@index')
-    ->name('products.index');
-Route::middleware('auth:sanctum')->get('products/{id}', 'App\Http\Controllers\v1\ProductController@show')
-    ->name('products.show');
-Route::middleware('auth:sanctum')->post('products', 'App\Http\Controllers\v1\ProductController@store')
-    ->name('products.store');
-Route::middleware('auth:sanctum')->put('products/{id}', 'App\Http\Controllers\v1\ProductController@update')
-    ->name('products.update');
-Route::middleware('auth:sanctum')->delete('products/{id}', 'App\Http\Controllers\v1\ProductController@destroy')
-    ->name('products.destroy');
-
-Route::middleware('auth:sanctum')->put('products/{product}/inactiveOrActivate', 'App\Http\Controllers\v1\ProductController@inactiveOrActivate')
-    ->name('products.inactiveOrActivate');
-
-//sales
-Route::get('sales', 'App\Http\Controllers\v1\SaleController@index')
-    ->name('sales.index');
-Route::get('sales/{id}', 'App\Http\Controllers\v1\SaleController@show')
-    ->name('sales.show');
-Route::post('sales', 'App\Http\Controllers\v1\SaleController@store')
-    ->name('sales.store');
-Route::put('sales/{id}', 'App\Http\Controllers\v1\SaleController@update')
-    ->name('sales.update');
-Route::delete('sales/{id}', 'App\Http\Controllers\v1\SaleController@destroy')
-    ->name('sales.destroy');
-
+    //sales
+    Route::get('sales', 'App\Http\Controllers\v1\SaleController@index')
+        ->name('v2.sales.index');
+    Route::get('sales/{id}', 'App\Http\Controllers\v1\SaleController@show')
+        ->name('v2.sales.show');
+    Route::post('sales', 'App\Http\Controllers\v1\SaleController@store')
+        ->name('v2.sales.store');
+    Route::put('sales/{id}', 'App\Http\Controllers\v1\SaleController@update')
+        ->name('v2.sales.update');
+    Route::delete('sales/{id}', 'App\Http\Controllers\v1\SaleController@destroy')
+        ->name('v2.sales.destroy');
+    // Agrega aquí más rutas que desees proteger con el middleware auth:sanctum.
+});

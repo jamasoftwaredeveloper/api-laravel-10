@@ -94,7 +94,7 @@ class ProductController extends Controller
    * @param Product $product
    * @return \Illuminate\Http\JsonResponse
    */
-  public function update(Request $request,  $id)
+  public function update(ProductUpdateRequest $request,  $id)
   {
     $validatedData = $request->validated(); // Validar los datos utilizando la regla definida en ProductCreateRequest
     $product = Product::find($id);

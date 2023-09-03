@@ -23,7 +23,7 @@ class SaleControllerTest extends TestCase
         $this->actingAs($user);
 
         // Realiza una solicitud GET a la ruta de index del controlador
-        $response = $this->get('/api/sales');
+        $response = $this->get('/api/v2/sales');
 
         // Verifica que la respuesta tenga el código de estado 200 y sea JSON
         $response->assertStatus(200)->assertJsonStructure([
@@ -75,7 +75,7 @@ class SaleControllerTest extends TestCase
             'email' => $faker->email()
         ];
 
-        $response = $this->post('/api/sales', $saleData);
+        $response = $this->post('/api/v2/sales', $saleData);
 
         // Verifica que la respuesta tenga el código de estado 200 y sea JSON
         $response->assertStatus(200);
@@ -139,7 +139,7 @@ class SaleControllerTest extends TestCase
         ProductSale::factory()->create($productsSalesData1);
         ProductSale::factory()->create($productsSalesData2);
 
-        $response = $this->get("/api/sales/{$sale->id}");
+        $response = $this->get("/api/v2/sales/{$sale->id}");
 
         // Verifica que la respuesta tenga el código de estado 201 y sea JSON
         $response->assertStatus($response->getStatusCode() === 200 ? 200 : 202);
@@ -209,7 +209,7 @@ class SaleControllerTest extends TestCase
             'email' => $faker->email()
         ];
 
-        $response = $this->put("/api/sales/{$sale->id}", $saleUpdateData);
+        $response = $this->put("/api/v2/sales/{$sale->id}", $saleUpdateData);
 
         // Verifica que la respuesta tenga el código de estado 200 y sea JSON
         $response->assertStatus($response->getStatusCode() === 200 ? 200 : 202);
@@ -270,7 +270,7 @@ class SaleControllerTest extends TestCase
         ProductSale::factory()->create($productsSalesData2);
 
         // Realiza una solicitud DELETE para eliminar la venta
-        $response = $this->delete("/api/sales/{$sale->id}");
+        $response = $this->delete("/api/v2/sales/{$sale->id}");
 
         // Verifica que la respuesta tenga el código de estado 204 (sin contenido)
         $response->assertStatus($response->getStatusCode() === 200 ? 200 : 202);

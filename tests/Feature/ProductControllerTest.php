@@ -26,7 +26,7 @@ class ProductControllerTest extends TestCase
         $this->actingAs($user);
 
         // Realiza una solicitud GET a la ruta de index del controlador
-        $response = $this->get('api/products');
+        $response = $this->get('api/v2/products');
 
         // Verifica que la respuesta tenga el código de estado 200 y sea JSON
         $response->assertStatus(200)->assertJsonStructure([
@@ -59,7 +59,7 @@ class ProductControllerTest extends TestCase
             'Accept' => 'application/json',
         ]);
 
-        $response = $this->post('api/products', $product);
+        $response = $this->post('api/v2/products', $product);
         $response
             ->assertStatus(201);
     }
@@ -86,7 +86,7 @@ class ProductControllerTest extends TestCase
         $product = Product::factory()->create($product);
 
         // Realiza una solicitud GET a la ruta de show del controlador con el ID del producto
-        $response = $this->get("api/products/{$product->id}");
+        $response = $this->get("api/v2/products/{$product->id}");
 
         $response->assertStatus($response->getStatusCode() === 200 ? 200 : 202);
     }
@@ -122,7 +122,7 @@ class ProductControllerTest extends TestCase
             'active' => true,
         ];
 
-        $response = $this->put("api/products/{$product->id}",$productUpdate);
+        $response = $this->put("api/v2/products/{$product->id}", $productUpdate);
 
         $response
             ->assertStatus($response->getStatusCode() === 200 ? 200 : 202);
@@ -138,7 +138,7 @@ class ProductControllerTest extends TestCase
         $id = rand(1, 50);
 
         // Realiza una solicitud DELETE para eliminar el producto
-        $response = $this->delete("api/products/{$id}");
+        $response = $this->delete("api/v2/products/{$id}");
 
         $response
             ->assertStatus($response->getStatusCode() === 200 ? 200 : 202);
