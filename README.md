@@ -1,8 +1,13 @@
 # DOCUMENTACIÓN
-
+# Tener en cuenta.
+Se requiere:
+1. php ^8.1.
+2. composer.
+3. mysql.
 # Paso a paso.
-Se deben creaR dos bases de datos, una para dev y otra para test.
+Se deben crear dos bases de datos, una para dev y otra para test.
 Se deben configurar los archivos .env y env.testing con conexion a mysql, luego de hecho siga los siguientes pasos:
+Al descargar el proyecto recuerda darle composer install y php artisan key:generate y verificar que los dos archivos .env tenga su api key
 # Creación de tablas de mi base datos y llenado.
 php artisan migrate:fresh --seed
 # Creación de tablas de mi base datos de testing y llenado. 
