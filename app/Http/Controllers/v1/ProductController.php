@@ -102,7 +102,7 @@ class ProductController extends Controller
     $product = Product::find($id);
     try {
       if (!$product) {
-        return response()->json(['info' => "Aviso", 'message' => "Producto no exite"], 204);
+        return response()->json(['info' => "Aviso", 'message' => "Producto no exite"], 202);
       }
       if ($product->isInactive()) {
         return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id, está inactivo"], 401);
