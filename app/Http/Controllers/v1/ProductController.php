@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use App\Http\Traits\GlobalTrait;
 use Illuminate\Support\Facades\Config;
 
+use function PHPUnit\Framework\isNull;
+
 class ProductController extends Controller
 {
   use GlobalTrait;
@@ -73,14 +75,14 @@ class ProductController extends Controller
   public function show($id)
   {
     try {
-      $product = Product::where('id',$id)->where('active', 1);
+      $product = Product::find($id);
       if (!$product) {
-        return response()->json(['info' => "Aviso", 'details' => "Producto no exite"], 204);
+        return response()->json(['info' => "Aviso", 'message' => "Producto no exite"], 202);
       }
       if ($product->isInactive()) {
-        return response()->json(['info' => 'Inactivo', 'details' => "El producto $product->id, está inactivo"], 401);
+        return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id, está inactivo"], 401);
       }
-      return response()->json(new ProductResource($product), 201);
+      return response()->json(new ProductResource($product), 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
     }
@@ -92,19 +94,21 @@ class ProductController extends Controller
    * @param Product $product
    * @return \Illuminate\Http\JsonResponse
    */
-  public function update(ProductUpdateRequest $request,  $id)
+  public function update(Request $request,  $id)
   {
-    $product = Product::where('id',$id)->where('active', 1);
+    return response()->json(['info' => "Aviso", 'message' => $request->all()], 200);
+    $validatedData = $request->validated(); // Validar los datos utilizando la regla definida en ProductCreateRequest
+    return response()->json(['info' => "Aviso", 'message' => $validatedData['name']], 200);
+    $product = Product::find($id);
     try {
       if (!$product) {
-        return response()->json(['info' => "Aviso", 'details' => "Producto no exite"], 204);
+        return response()->json(['info' => "Aviso", 'message' => "Producto no exite"], 204);
       }
       if ($product->isInactive()) {
-        return response()->json(['info' => 'Inactivo', 'details' => "El producto $product->id, está inactivo"], 401);
+        return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id, está inactivo"], 401);
       }
-      $validatedData = $request->validated(); // Validar los datos utilizando la regla definida en ProductCreateRequest
       $product->update($validatedData);
-      return response()->json(new ProductResource($product), 201);
+      return response()->json(new ProductResource($product), 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
     }
@@ -123,11 +127,11 @@ class ProductController extends Controller
       $product = Product::find($id);
 
       if (!$product) {
-        return response()->json(['info' => "Aviso", 'details' => "Producto no exite"], 200);
+        return response()->json(['info' => "Aviso", 'message' => "Producto no exite"], 202);
       }
-
+      return response()->json(['info' => "Aviso", 'message' => $product], 202);
       $product->delete();
-      return response()->json(['success' => "Éxito", 'details' => "Se ha elimando correctamente"], 204);
+      return response()->json(['success' => "Éxito", 'message' => "Se ha elimando correctamente"], 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
     }
@@ -145,7 +149,7 @@ class ProductController extends Controller
     try {
       $product->active = $request->active;
       $product->save();
-      return response()->json(['success' => "Éxito", 'details' => "Se ha cambiado exitosamente el estado del producto $product->id"], 204);
+      return response()->json(['success' => "Éxito", 'message' => "Se ha cambiado exitosamente el estado del producto $product->id"], 204);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
     }

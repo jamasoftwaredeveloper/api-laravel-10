@@ -13,16 +13,7 @@ trait GlobalTrait
      */
     private function handleException(\Exception $ex, $message = 'Algo salió mal')
     {
-        return response()->json(['error' => $message, 'details' => $ex->getMessage(),  'line' =>$ex->getLine()], 100);
+        return response()->json(['error' => $message, 'details' => $ex->getMessage(),'line' =>$ex->getLine()], $ex->getCode());
     }
 
-    /**
-     * Comprueba si el producto está inactivo.
-     *
-     * @return bool
-     */
-    public function isInactive()
-    {
-        return $this->active === 0;
-    }
 }

@@ -6,7 +6,6 @@ use App\Models\v1\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -30,9 +29,9 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
         ]);
 
-        $token = $user->createToken('Personal Access Token')->plainTextToken;
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json(['token' => $token, 'user' => $user]);
+        return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     /**
@@ -49,15 +48,14 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            return response()->json([
+                'message' => 'Unauthorized'
+            ], 401);
         }
 
-        $user = $request->user();
-        $token = $user->createToken('Personal Access Token')->plainTextToken;
-
-        return response()->json(['token' => $token, 'user' => $user]);
+        $user = User::where('email', $request->email)->first();
+        $token = $user->createToken('auth_token')->plainTextToken;
+        return response()->json(['data' => $user, 'access_token' => $token, 'token_type' => 'Bearer']);
     }
 
     /**
@@ -68,9 +66,17 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        // Logout the user
+        if (auth()->user()) {
 
-        return response()->json(['message' => 'Logged out']);
+            $user = User::find(auth()->user()->id);
+            $user->tokens()->delete();
+
+            return response()->json(['message' => 'Logged out', 'status' => true], 200);
+        } else {
+
+            return response()->json(['message' => 'No tokens available', 'status' => true], 200);
+        }
     }
 
     /**
@@ -79,8 +85,8 @@ class AuthController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function userProfile(Request $request)
+    public function userProfile()
     {
-        return response()->json($request->user());
+        return response()->json(Auth::user());
     }
 }
