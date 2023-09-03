@@ -4,10 +4,11 @@ namespace App\Models\v1;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory,HasApiTokens;
 
     protected $table = 'products';
 
@@ -22,14 +23,15 @@ class Product extends Model
     ];
     public function toArray()
     {
+        $quantity = $this->pivot ? $this->pivot->quantity : 1;
         return [
             'sku' => $this->sku,
             'name' => $this->name,
             'description' => $this->description,
             'photo' => $this->photo,
             'price' => $this->price,
-            'quantity' => $this->pivot->quantity,
-            'sub_total' => ($this->price + ($this->price * $this->iva / 100)) * $this->pivot->quantity,
+            'quantity' => $quantity,
+            'sub_total' => ($this->price + ($this->price * $this->iva / 100)) * $quantity,
             'iva' => $this->iva,
             'active' => $this->active,
             'created_at' => $this->created_at,
@@ -40,7 +42,7 @@ class Product extends Model
     public function sales()
     {
         return $this->belongsToMany(Sale::class, 'products_sales')
-            ->withPivot('quantity');
+            ->withPivot('quantity')->withDefault(['quantity' => 0]);
     }
 
     /**

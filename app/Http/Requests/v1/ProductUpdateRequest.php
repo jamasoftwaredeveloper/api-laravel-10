@@ -26,7 +26,7 @@ class ProductUpdateRequest extends FormRequest
         return [
             'name' => 'required|string|unique:products,name,' . $productId,
             'description' => 'required|string',
-            'photo' => 'nullable|image',
+            'photo' => 'nullable',
             'price' => 'required|numeric|min:0',
             'iva' => 'required|numeric|min:0',
             'active' => 'required|boolean'

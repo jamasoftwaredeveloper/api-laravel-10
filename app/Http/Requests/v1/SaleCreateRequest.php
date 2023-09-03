@@ -25,7 +25,7 @@ class SaleCreateRequest extends FormRequest
 
             'products' => 'required|array', // 'products' debe ser un arreglo requerido
             'products.*.id' => 'required|integer', // Cada elemento 'id' dentro de 'products' debe ser un entero
-            'products.*.quantity' => 'required|integer', // Cada elemento 'quantity' dentro de 'products' debe ser un entero
+            'products.*.quantity' => 'required|integer|min:1', // Cada elemento 'quantity' dentro de 'products' debe ser un entero
             'sale.*.number' => 'required|string|unique:sales',
             'sale.*.customer' => 'required|string',
             'sale.*.phone' => 'required|string|regex:/^[0-9]{9}$/',

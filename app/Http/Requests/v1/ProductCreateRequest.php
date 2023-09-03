@@ -3,6 +3,8 @@
 namespace App\Http\Requests\v1;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Support\Facades\Validator;
 
 class ProductCreateRequest extends FormRequest
 {
@@ -22,9 +24,10 @@ class ProductCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'sku' => 'required|string|unique:products',
             'name' => 'required|string|unique:products',
             'description' => 'required|string',
-            'photo' => 'nullable|image',
+            'photo' => 'nullable',
             'price' => 'required|numeric|min:0',
             'iva' => 'required|numeric|min:0',
             'active' => 'required|boolean'
