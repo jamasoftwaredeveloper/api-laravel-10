@@ -1,0 +1,54 @@
+services:
+  laravel-app:
+    container_name: proyecto
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=laravel
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    volumes:
+      - .:/var/www/html  # Sincroniza el código de tu proyecto
+      - vendor_data:/var/www/html/vendor  # Crear un volumen separado para `vendor`
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  db:
+    container_name: mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"  # Cambia el puerto de phpMyAdmin a 8080
+    environment:
+      PMA_HOST: db  # Indica el host de la base de datos
+      PMA_USER: root  # Usuario de MySQL
+      PMA_PASSWORD: root  # Contraseña de MySQL
+    networks:
+      - app-network
+volumes:
+  db_data:
+  vendor_data:  # Volumen separado para la carpeta `vendor`
+  swagger_data:  # Volumen para Swagger
+
+networks:
+  app-network:

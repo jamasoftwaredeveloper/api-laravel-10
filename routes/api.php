@@ -31,7 +31,7 @@ Route::prefix('v1')->group(function () {
         ->name('v1.products.update');
     Route::delete('products/{id}', 'App\Http\Controllers\v1\ProductController@destroy')
         ->name('v1.products.destroy');
-    Route::put('products/{product}/inactiveOrActivate', 'App\Http\Controllers\v1\ProductController@inactiveOrActivate')
+    Route::put('products/{id}/inactiveOrActivate', 'App\Http\Controllers\v1\ProductController@inactiveOrActivate')
         ->name('v1.products.inactiveOrActivate');
 
     //sales
@@ -64,7 +64,7 @@ Route::middleware(['auth:sanctum'])->prefix('v2')->group(function () {
         ->name('v2.products.update');
     Route::delete('products/{id}', 'App\Http\Controllers\v1\ProductController@destroy')
         ->name('v2.products.destroy');
-    Route::put('products/{product}/inactiveOrActivate', 'App\Http\Controllers\v1\ProductController@inactiveOrActivate')
+    Route::put('products/{id}/inactiveOrActivate', 'App\Http\Controllers\v1\ProductController@inactiveOrActivate')
         ->name('v2.products.inactiveOrActivate');
 
     //sales

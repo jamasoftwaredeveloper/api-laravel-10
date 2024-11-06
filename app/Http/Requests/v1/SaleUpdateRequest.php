@@ -29,10 +29,13 @@ class SaleUpdateRequest extends FormRequest
             'products' => 'required|array', // 'products' debe ser un arreglo requerido
             'products.*.id' => 'required|integer', // Cada elemento 'id' dentro de 'products' debe ser un entero
             'products.*.quantity' => 'required|integer|min:1', // Cada elemento 'quantity' dentro de 'products' debe ser un entero
-            'number' => 'required|string|unique:sales,number,' . $saleId,
-            'customer' => 'required|string',
-            'phone' => 'required|string',
-            'email' => 'required|string|email'
+
+            // Campos opcionales para la actualización
+            'number' => ['sometimes', 'string', Rule::unique('sales', 'number')->ignore($saleId)],
+            'customer' => 'sometimes|string',
+            'phone' => 'sometimes|string',
+            'email' => 'sometimes|string|email',
         ];
     }
 }
+

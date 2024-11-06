@@ -1,0 +1,1683 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de Productos y Ventas",
+        "description": "Documentación de la API para gestionar productos y ventas",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api"
+        }
+    ],
+    "paths": {
+        "/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registro de un nuevo usuario",
+                "description": "Registro de un nuevo usuario.",
+                "operationId": "0903f2e0df1a8857bee538fc055417f0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "johndoe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "johndoe@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "token"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación de datos fallida"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Inicio de sesión de usuario",
+                "description": "Inicio de sesión de usuario.",
+                "operationId": "2dd578ff7aba2721293dac66833b27d1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "johndoe@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Inicio de sesión exitoso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "johndoe@example.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "token"
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales incorrectas"
+                    },
+                    "422": {
+                        "description": "Validación de datos fallida"
+                    }
+                }
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Cierre de sesión de usuario",
+                "description": "Cierre de sesión de usuario.",
+                "operationId": "68a6108af04af5e3bc1ea68a6c6f1299",
+                "responses": {
+                    "200": {
+                        "description": "Cierre de sesión exitoso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out"
+                                        },
+                                        "status": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v2/user/profile": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Perfil del usuario autenticado",
+                "description": "Perfil del usuario autenticado.",
+                "operationId": "c1df9744f275f8353f66a0da916a5113",
+                "responses": {
+                    "200": {
+                        "description": "Perfil del usuario",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "johndoe@example.com"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v2/products": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Mostrar productos",
+                "operationId": "aebccb940e8604d1a2e6202e77d51e08",
+                "responses": {
+                    "200": {
+                        "description": "Mostrar todos los productos.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "action": {
+                                            "type": "string",
+                                            "example": "Listado de productos"
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "example": "product"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 39
+                                                    },
+                                                    "sku": {
+                                                        "type": "string",
+                                                        "example": "6141143809762"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Ms. Aylin Macejkovic"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Quo enim repudiandae corporis."
+                                                    },
+                                                    "photo": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://via.placeholder.com/640x480.png/00cccc?text=voluptatem"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 997.17
+                                                    },
+                                                    "iva": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 19.16
+                                                    },
+                                                    "active": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "creador": {
+                                            "properties": {
+                                                "organization": {
+                                                    "type": "string",
+                                                    "example": "Jm pramming"
+                                                },
+                                                "author": {
+                                                    "type": "string",
+                                                    "example": "Jefri Martínez"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 4
+                                                },
+                                                "path": {
+                                                    "type": "string",
+                                                    "example": "http://localhost:8000/v2/products"
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 15
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 50
+                                                },
+                                                "links": {
+                                                    "properties": {
+                                                        "first": {
+                                                            "type": "string",
+                                                            "example": "http://localhost:8000/v2/products?page=1"
+                                                        },
+                                                        "last": {
+                                                            "type": "string",
+                                                            "example": "http://localhost:8000/v2/products?page=4"
+                                                        },
+                                                        "prev": {
+                                                            "type": "string",
+                                                            "example": null,
+                                                            "nullable": true
+                                                        },
+                                                        "next": {
+                                                            "type": "string",
+                                                            "example": "http://localhost:8000/v2/products?page=2"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Ha ocurrido un error."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Crear un nuevo producto",
+                "operationId": "9e8b7db2d4cf080623d702cd37bb3cd1",
+                "requestBody": {
+                    "description": "Datos para crear un nuevo producto",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "sku",
+                                    "name",
+                                    "description",
+                                    "price",
+                                    "iva",
+                                    "active"
+                                ],
+                                "properties": {
+                                    "sku": {
+                                        "description": "Código único del producto",
+                                        "type": "string",
+                                        "example": "123456"
+                                    },
+                                    "name": {
+                                        "description": "Nombre del producto",
+                                        "type": "string",
+                                        "example": "Nombre del producto"
+                                    },
+                                    "description": {
+                                        "description": "Descripción del producto",
+                                        "type": "string",
+                                        "example": "Descripción del producto"
+                                    },
+                                    "photo": {
+                                        "description": "URL de la foto del producto",
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "http://example.com/photo.jpg"
+                                    },
+                                    "price": {
+                                        "description": "Precio del producto",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 19.99
+                                    },
+                                    "iva": {
+                                        "description": "Porcentaje de IVA del producto",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0.19
+                                    },
+                                    "active": {
+                                        "description": "Estado de disponibilidad del producto",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Producto creado exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "sku": {
+                                            "description": "Código único del producto",
+                                            "type": "string",
+                                            "example": "123456"
+                                        },
+                                        "name": {
+                                            "description": "Nombre del producto",
+                                            "type": "string",
+                                            "example": "Nombre del producto"
+                                        },
+                                        "description": {
+                                            "description": "Descripción del producto",
+                                            "type": "string",
+                                            "example": "Descripción del producto"
+                                        },
+                                        "photo": {
+                                            "description": "URL de la foto del producto",
+                                            "type": "string",
+                                            "format": "uri",
+                                            "example": "http://example.com/photo.jpg"
+                                        },
+                                        "price": {
+                                            "description": "Precio del producto",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 19.99
+                                        },
+                                        "iva": {
+                                            "description": "Porcentaje de IVA del producto",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0.19
+                                        },
+                                        "active": {
+                                            "description": "Estado de disponibilidad del producto",
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Ha ocurrido un error."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v2/products/{id}": {
+            "get": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Obtener un producto por ID",
+                "operationId": "260dceb9470ab121d07af41d81585186",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Producto encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "sku": {
+                                            "description": "Código único del producto",
+                                            "type": "string",
+                                            "example": "123456"
+                                        },
+                                        "name": {
+                                            "description": "Nombre del producto",
+                                            "type": "string",
+                                            "example": "Nombre del producto"
+                                        },
+                                        "description": {
+                                            "description": "Descripción del producto",
+                                            "type": "string",
+                                            "example": "Descripción del producto"
+                                        },
+                                        "photo": {
+                                            "description": "URL de la foto del producto",
+                                            "type": "string",
+                                            "format": "uri",
+                                            "example": "http://example.com/photo.jpg"
+                                        },
+                                        "price": {
+                                            "description": "Precio del producto",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 19.99
+                                        },
+                                        "iva": {
+                                            "description": "Porcentaje de IVA del producto",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0.19
+                                        },
+                                        "active": {
+                                            "description": "Estado de disponibilidad del producto",
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Producto no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Producto inactivo.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Actualizar un producto existente",
+                "operationId": "08640f107bb3c886e45f59042a8183b9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos para crear un nuevo producto",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "sku",
+                                    "name",
+                                    "description",
+                                    "price",
+                                    "iva",
+                                    "active"
+                                ],
+                                "properties": {
+                                    "sku": {
+                                        "description": "Código único del producto",
+                                        "type": "string",
+                                        "example": "123456"
+                                    },
+                                    "name": {
+                                        "description": "Nombre del producto",
+                                        "type": "string",
+                                        "example": "Nombre del producto"
+                                    },
+                                    "description": {
+                                        "description": "Descripción del producto",
+                                        "type": "string",
+                                        "example": "Descripción del producto"
+                                    },
+                                    "photo": {
+                                        "description": "URL de la foto del producto",
+                                        "type": "string",
+                                        "format": "uri",
+                                        "example": "http://example.com/photo.jpg"
+                                    },
+                                    "price": {
+                                        "description": "Precio del producto",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 19.99
+                                    },
+                                    "iva": {
+                                        "description": "Porcentaje de IVA del producto",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0.19
+                                    },
+                                    "active": {
+                                        "description": "Estado de disponibilidad del producto",
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Producto creado exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "sku": {
+                                            "description": "Código único del producto",
+                                            "type": "string",
+                                            "example": "123456"
+                                        },
+                                        "name": {
+                                            "description": "Nombre del producto",
+                                            "type": "string",
+                                            "example": "Nombre del producto"
+                                        },
+                                        "description": {
+                                            "description": "Descripción del producto",
+                                            "type": "string",
+                                            "example": "Descripción del producto"
+                                        },
+                                        "photo": {
+                                            "description": "URL de la foto del producto",
+                                            "type": "string",
+                                            "format": "uri",
+                                            "example": "http://example.com/photo.jpg"
+                                        },
+                                        "price": {
+                                            "description": "Precio del producto",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 19.99
+                                        },
+                                        "iva": {
+                                            "description": "Porcentaje de IVA del producto",
+                                            "type": "number",
+                                            "format": "float",
+                                            "example": 0.19
+                                        },
+                                        "active": {
+                                            "description": "Estado de disponibilidad del producto",
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Producto no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Producto inactivo.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Eliminar un producto específico",
+                "operationId": "737769c0788356090afaffec1c68617d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Producto eliminado exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Producto no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v2/products/{id}/inactiveOrActivate": {
+            "put": {
+                "tags": [
+                    "Products"
+                ],
+                "summary": "Cambiar estado de activación de un producto",
+                "operationId": "029592754d18fa8e73ca3b44a19fb035",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "active": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Estado del producto actualizado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Producto no encontrado.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/sales": {
+            "get": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Mostrar ventas",
+                "operationId": "5517990a054adc438ccc373535962fe1",
+                "responses": {
+                    "200": {
+                        "description": "Mostrar todos los ventas.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "description": "Indica si la solicitud fue exitosa",
+                                            "type": "boolean"
+                                        },
+                                        "action": {
+                                            "description": "Descripción de la acción realizada",
+                                            "type": "string"
+                                        },
+                                        "type": {
+                                            "description": "Tipo de dato devuelto",
+                                            "type": "string"
+                                        },
+                                        "data": {
+                                            "description": "Colección de ventas",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "description": "Identificador único de la venta",
+                                                        "type": "integer"
+                                                    },
+                                                    "number": {
+                                                        "description": "Número de la venta",
+                                                        "type": "string"
+                                                    },
+                                                    "customer": {
+                                                        "description": "Nombre del cliente",
+                                                        "type": "string"
+                                                    },
+                                                    "phone": {
+                                                        "description": "Teléfono del cliente",
+                                                        "type": "string"
+                                                    },
+                                                    "email": {
+                                                        "description": "Correo electrónico del cliente",
+                                                        "type": "string",
+                                                        "format": "email"
+                                                    },
+                                                    "details": {
+                                                        "description": "Detalles de los productos en la venta",
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 39
+                                                                },
+                                                                "sku": {
+                                                                    "type": "string",
+                                                                    "example": "6141143809762"
+                                                                },
+                                                                "name": {
+                                                                    "type": "string",
+                                                                    "example": "Ms. Aylin Macejkovic"
+                                                                },
+                                                                "description": {
+                                                                    "type": "string",
+                                                                    "example": "Quo enim repudiandae corporis."
+                                                                },
+                                                                "photo": {
+                                                                    "type": "string",
+                                                                    "format": "uri",
+                                                                    "example": "https://via.placeholder.com/640x480.png/00cccc?text=voluptatem"
+                                                                },
+                                                                "price": {
+                                                                    "type": "number",
+                                                                    "format": "float",
+                                                                    "example": 997.17
+                                                                },
+                                                                "iva": {
+                                                                    "type": "number",
+                                                                    "format": "float",
+                                                                    "example": 19.16
+                                                                },
+                                                                "active": {
+                                                                    "type": "integer",
+                                                                    "example": 1
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    },
+                                                    "total": {
+                                                        "description": "Total de la venta calculado",
+                                                        "type": "number",
+                                                        "format": "float"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "creador": {
+                                            "description": "Información del creador de la respuesta",
+                                            "properties": {
+                                                "organization": {
+                                                    "description": "Nombre de la organización creadora",
+                                                    "type": "string"
+                                                },
+                                                "author": {
+                                                    "description": "Nombre del autor",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "description": "Metadatos sobre la paginación",
+                                            "properties": {
+                                                "current_page": {
+                                                    "description": "Número de la página actual",
+                                                    "type": "integer"
+                                                },
+                                                "from": {
+                                                    "description": "Índice del primer elemento en la página",
+                                                    "type": "integer"
+                                                },
+                                                "last_page": {
+                                                    "description": "Número de la última página",
+                                                    "type": "integer"
+                                                },
+                                                "path": {
+                                                    "description": "Ruta del recurso",
+                                                    "type": "string"
+                                                },
+                                                "per_page": {
+                                                    "description": "Número de elementos por página",
+                                                    "type": "integer"
+                                                },
+                                                "to": {
+                                                    "description": "Índice del último elemento en la página",
+                                                    "type": "integer"
+                                                },
+                                                "total": {
+                                                    "description": "Número total de elementos",
+                                                    "type": "integer"
+                                                },
+                                                "links": {
+                                                    "description": "Enlaces de paginación",
+                                                    "properties": {
+                                                        "first": {
+                                                            "description": "URL de la primera página",
+                                                            "type": "string"
+                                                        },
+                                                        "last": {
+                                                            "description": "URL de la última página",
+                                                            "type": "string"
+                                                        },
+                                                        "prev": {
+                                                            "description": "URL de la página anterior",
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        },
+                                                        "next": {
+                                                            "description": "URL de la siguiente página",
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Ha ocurrido un error."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Crear un nueva venta",
+                "operationId": "5b328fa7695b8a15d56773b62d8de578",
+                "requestBody": {
+                    "description": "Datos para crear un nueva venta",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "number",
+                                    "customer",
+                                    "phone",
+                                    "email",
+                                    "products"
+                                ],
+                                "properties": {
+                                    "number": {
+                                        "description": "Número de la venta",
+                                        "type": "string"
+                                    },
+                                    "customer": {
+                                        "description": "Nombre del cliente",
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "description": "Teléfono del cliente",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "Correo electrónico del cliente",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "products": {
+                                        "description": "Detalles de los productos en la venta",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "1"
+                                                },
+                                                "quantity": {
+                                                    "type": "number",
+                                                    "example": "1"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Venta creada exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "id",
+                                        "number",
+                                        "customer",
+                                        "phone",
+                                        "email",
+                                        "products",
+                                        "total"
+                                    ],
+                                    "properties": {
+                                        "id": {
+                                            "description": "Id",
+                                            "type": "string"
+                                        },
+                                        "number": {
+                                            "description": "Número de la venta",
+                                            "type": "string"
+                                        },
+                                        "customer": {
+                                            "description": "Nombre del cliente",
+                                            "type": "string"
+                                        },
+                                        "phone": {
+                                            "description": "Teléfono del cliente",
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "description": "Correo electrónico del cliente",
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "products": {
+                                            "description": "Detalles de los productos en la venta",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "1"
+                                                    },
+                                                    "quantity": {
+                                                        "type": "number",
+                                                        "example": "1"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "description": "Total de la compra",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Ha ocurrido un error."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/v2/sales/{id}": {
+            "get": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Mostrar información de una venta específica",
+                "operationId": "662212c44d8e27a96121dc2bf90e330d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la venta",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Datos para crear un nueva venta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "id",
+                                        "number",
+                                        "customer",
+                                        "phone",
+                                        "email",
+                                        "details",
+                                        "total"
+                                    ],
+                                    "properties": {
+                                        "id": {
+                                            "description": "Identificador único de la venta",
+                                            "type": "integer"
+                                        },
+                                        "number": {
+                                            "description": "Número de la venta",
+                                            "type": "string"
+                                        },
+                                        "customer": {
+                                            "description": "Nombre del cliente",
+                                            "type": "string"
+                                        },
+                                        "phone": {
+                                            "description": "Teléfono del cliente",
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "description": "Correo electrónico del cliente",
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "details": {
+                                            "description": "Detalles de los productos en la venta",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "sku": {
+                                                        "type": "string",
+                                                        "example": "6141143809762"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Ms. Aylin Macejkovic"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Quo enim repudiandae corporis."
+                                                    },
+                                                    "photo": {
+                                                        "type": "string",
+                                                        "format": "uri",
+                                                        "example": "https://via.placeholder.com/640x480.png/00cccc?text=voluptatem"
+                                                    },
+                                                    "price": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 997.17
+                                                    },
+                                                    "iva": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 19.16
+                                                    },
+                                                    "active": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "description": "Total de la venta calculado",
+                                            "type": "number",
+                                            "format": "float"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Venta no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string",
+                                            "example": "Warning"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sale does not exist"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error inesperado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Actualizar una venta",
+                "operationId": "3b042942577db9372a0ba9a8d8a414a0",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la venta",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos para crear un nueva venta",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "number",
+                                    "customer",
+                                    "phone",
+                                    "email",
+                                    "products"
+                                ],
+                                "properties": {
+                                    "number": {
+                                        "description": "Número de la venta",
+                                        "type": "string"
+                                    },
+                                    "customer": {
+                                        "description": "Nombre del cliente",
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "description": "Teléfono del cliente",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "Correo electrónico del cliente",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "products": {
+                                        "description": "Detalles de los productos en la venta",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "string",
+                                                    "example": "4"
+                                                },
+                                                "quantity": {
+                                                    "type": "number",
+                                                    "example": "4"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Venta actualizada exitosamente.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "required": [
+                                        "id",
+                                        "number",
+                                        "customer",
+                                        "phone",
+                                        "email",
+                                        "products",
+                                        "total"
+                                    ],
+                                    "properties": {
+                                        "id": {
+                                            "description": "Id",
+                                            "type": "string"
+                                        },
+                                        "number": {
+                                            "description": "Número de la venta",
+                                            "type": "string"
+                                        },
+                                        "customer": {
+                                            "description": "Nombre del cliente",
+                                            "type": "string"
+                                        },
+                                        "phone": {
+                                            "description": "Teléfono del cliente",
+                                            "type": "string"
+                                        },
+                                        "email": {
+                                            "description": "Correo electrónico del cliente",
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "products": {
+                                            "description": "Detalles de los productos en la venta",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "1"
+                                                    },
+                                                    "quantity": {
+                                                        "type": "number",
+                                                        "example": "1"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "total": {
+                                            "description": "Total de la compra",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Venta no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string",
+                                            "example": "Warning"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sale does not exist"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error inesperado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Sales"
+                ],
+                "summary": "Eliminar una venta",
+                "operationId": "14734dd4bf1ca6fba6bb58f911838f16",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la venta",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Venta eliminada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "Success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Successfully deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Venta no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "info": {
+                                            "type": "string",
+                                            "example": "Warning"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sale does not exist"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Error inesperado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Token de autenticación para acceder a la API",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Products",
+            "description": "Products"
+        },
+        {
+            "name": "Sales",
+            "description": "Sales"
+        }
+    ]
+}

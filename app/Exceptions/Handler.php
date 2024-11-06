@@ -30,7 +30,7 @@ class Handler extends ExceptionHandler
                 return response()->json(
                     [
                         'status'=>false,
-                        'message'=>'The selected id is invalid'
+                        'message'=>'Ruta no existente'
                     ],400
                 );
             }

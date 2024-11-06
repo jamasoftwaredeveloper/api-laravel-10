@@ -7,42 +7,103 @@ use App\Http\Requests\v1\ProductCreateRequest;
 use App\Http\Requests\v1\ProductUpdateRequest;
 use App\Http\Resources\v1\ProductCollection;
 use App\Http\Resources\v1\ProductResource;
-use App\Models\v1\Product;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
-use App\Http\Traits\GlobalTrait;
 use Illuminate\Support\Facades\Config;
+use App\Http\Traits\GlobalTrait;
+use OpenApi\Annotations as OA;
 
-use function PHPUnit\Framework\isNull;
 
+/**
+ * @OA\Tag(
+ *     name="Productos",
+ *     description="Operaciones relacionadas con los productos"
+ * )
+ */
 class ProductController extends Controller
 {
   use GlobalTrait;
+
+  protected $productService;
   protected $order;
   protected $page;
 
   /**
    * Constructor de la clase ProductController.
-   *
-   * Inicializa las dependencias como el orden y la paginación desde la configuración.
    */
-  public function __construct()
+  public function __construct(ProductService $productService)
   {
-    $this->order = Config::get('variable.order');
-    $this->page = Config::get('variable.page');
+    $this->productService = $productService;
+    $this->order = Config::get('variable.order', 'asc');
+    $this->page = Config::get('variable.page', 15);
   }
-
   /**
-   * Obtiene una lista paginada de productos activos.
-   *
-   * @param Request $request
-   * @return \Illuminate\Http\JsonResponse
+   * @OA\Get(
+   *     path="/v2/products",
+   *     summary="Mostrar productos",
+   *     tags={"Products"},
+   *     security={{"bearerAuth": {}}}, 
+   *     @OA\Response(
+   *         response=200,
+   *         description="Mostrar todos los productos.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="success", type="boolean", example=true),
+   *             @OA\Property(property="action", type="string", example="Listado de productos"),
+   *             @OA\Property(property="type", type="string", example="product"),
+   *             @OA\Property(
+   *                 property="data",
+   *                 type="array",
+   *                 @OA\Items(
+   *                     @OA\Property(property="id", type="integer", example=39),
+   *                     @OA\Property(property="sku", type="string", example="6141143809762"),
+   *                     @OA\Property(property="name", type="string", example="Ms. Aylin Macejkovic"),
+   *                     @OA\Property(property="description", type="string", example="Quo enim repudiandae corporis."),
+   *                     @OA\Property(property="photo", type="string", format="uri", example="https://via.placeholder.com/640x480.png/00cccc?text=voluptatem"),
+   *                     @OA\Property(property="price", type="number", format="float", example=997.17),
+   *                     @OA\Property(property="iva", type="number", format="float", example=19.16),
+   *                     @OA\Property(property="active", type="integer", example=1)
+   *                 )
+   *             ),
+   *             @OA\Property(
+   *                 property="creador",
+   *                 type="object",
+   *                 @OA\Property(property="organization", type="string", example="Jm pramming"),
+   *                 @OA\Property(property="author", type="string", example="Jefri Martínez")
+   *             ),
+   *             @OA\Property(
+   *                 property="meta",
+   *                 type="object",
+   *                 @OA\Property(property="current_page", type="integer", example=1),
+   *                 @OA\Property(property="from", type="integer", example=1),
+   *                 @OA\Property(property="last_page", type="integer", example=4),
+   *                 @OA\Property(property="path", type="string", example="http://localhost:8000/v2/products"),
+   *                 @OA\Property(property="per_page", type="integer", example=15),
+   *                 @OA\Property(property="to", type="integer", example=15),
+   *                 @OA\Property(property="total", type="integer", example=50),
+   *                 @OA\Property(
+   *                     property="links",
+   *                     type="object",
+   *                     @OA\Property(property="first", type="string", example="http://localhost:8000/v2/products?page=1"),
+   *                     @OA\Property(property="last", type="string", example="http://localhost:8000/v2/products?page=4"),
+   *                     @OA\Property(property="prev", type="string", nullable=true, example=null),
+   *                     @OA\Property(property="next", type="string", example="http://localhost:8000/v2/products?page=2")
+   *                 )
+   *             )
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response="default",
+   *         description="Ha ocurrido un error."
+   *     )
+   * )
    */
   public function index(Request $request)
   {
     try {
-      $order = $request->has('order') ? $request->input('order') : $this->order;
-      $page = $request->has('page') ? $request->input('page') : $this->page;
-      $products = Product::where('active', 1)->orderBy('created_at', $order)->paginate($page);
+      $order = $request->input('order', $this->order);
+      $page = $request->input('page', $this->page);
+      $products = $this->productService->getAllActive($order, $page);
+
       return response()->json(new ProductCollection($products), 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
@@ -50,16 +111,54 @@ class ProductController extends Controller
   }
 
   /**
-   * Crea un nuevo producto.
-   *
-   * @param ProductCreateRequest $request
-   * @return \Illuminate\Http\JsonResponse
+   * @OA\Post(
+   *     path="/v2/products",
+   *     summary="Crear un nuevo producto",
+   *     tags={"Products"},
+   *     security={{"bearerAuth": {}}},
+   *     @OA\RequestBody(
+   *         required=true,
+   *         description="Datos para crear un nuevo producto",
+   *         @OA\JsonContent(
+   *             type="object",
+   *             required={"sku", "name", "description", "price", "iva", "active"},
+   *             @OA\Property(property="sku", type="string", example="123456", description="Código único del producto"),
+   *             @OA\Property(property="name", type="string", example="Nombre del producto", description="Nombre del producto"),
+   *             @OA\Property(property="description", type="string", example="Descripción del producto", description="Descripción del producto"),
+   *             @OA\Property(property="photo", type="string", format="uri", example="http://example.com/photo.jpg", description="URL de la foto del producto"),
+   *             @OA\Property(property="price", type="number", format="float", example=19.99, description="Precio del producto"),
+   *             @OA\Property(property="iva", type="number", format="float", example=0.19, description="Porcentaje de IVA del producto"),
+   *             @OA\Property(property="active", type="boolean", example=true, description="Estado de disponibilidad del producto")
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=201,
+   *         description="Producto creado exitosamente.",
+   *         @OA\JsonContent(
+   *            type="object",
+   *            properties={
+   *              @OA\Property(property="sku", type="string", example="123456", description="Código único del producto"),
+   *              @OA\Property(property="name", type="string", example="Nombre del producto", description="Nombre del producto"),
+   *              @OA\Property(property="description", type="string", example="Descripción del producto", description="Descripción del producto"),
+   *              @OA\Property(property="photo", type="string", format="uri", example="http://example.com/photo.jpg", description="URL de la foto del producto"),
+   *              @OA\Property(property="price", type="number", format="float", example=19.99, description="Precio del producto"),
+   *              @OA\Property(property="iva", type="number", format="float", example=0.19, description="Porcentaje de IVA del producto"),
+   *              @OA\Property(property="active", type="boolean", example=true, description="Estado de disponibilidad del producto")
+   *            }
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response="default",
+   *         description="Ha ocurrido un error."
+   *     )
+   * )
    */
   public function store(ProductCreateRequest $request)
   {
     try {
-      $validatedData = $request->validated(); // Validar los datos utilizando la regla definida en ProductCreateRequest
-      $product = Product::create($validatedData);
+      $validatedData = $request->validated();
+      $product = $this->productService->createProduct($validatedData);
+
       return response()->json(new ProductResource($product), 201);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
@@ -67,21 +166,63 @@ class ProductController extends Controller
   }
 
   /**
-   * Obtiene los detalles de un producto específico por su ID.
-   *
-   * @param Product $product
-   * @return \Illuminate\Http\JsonResponse
+   * @OA\Get(
+   *     path="/v2/products/{id}",
+   *     summary="Obtener un producto por ID",
+   *     tags={"Products"},
+   *     security={{"bearerAuth": {}}},
+   *     @OA\Parameter(
+   *         name="id",
+   *         in="path",
+   *         required=true,
+   *         @OA\Schema(type="integer")
+   *     ),
+   *     @OA\Response(
+   *         response=200,
+   *         description="Producto encontrado.",
+   *         @OA\JsonContent(
+   *            type="object",
+   *            properties={
+   *              @OA\Property(property="sku", type="string", example="123456", description="Código único del producto"),
+   *              @OA\Property(property="name", type="string", example="Nombre del producto", description="Nombre del producto"),
+   *              @OA\Property(property="description", type="string", example="Descripción del producto", description="Descripción del producto"),
+   *              @OA\Property(property="photo", type="string", format="uri", example="http://example.com/photo.jpg", description="URL de la foto del producto"),
+   *              @OA\Property(property="price", type="number", format="float", example=19.99, description="Precio del producto"),
+   *              @OA\Property(property="iva", type="number", format="float", example=0.19, description="Porcentaje de IVA del producto"),
+   *              @OA\Property(property="active", type="boolean", example=true, description="Estado de disponibilidad del producto")
+   *            }
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=404,
+   *         description="Producto no encontrado.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="info", type="string"),
+   *             @OA\Property(property="message", type="string")
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=403,
+   *         description="Producto inactivo.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="info", type="string"),
+   *             @OA\Property(property="message", type="string")
+   *         )
+   *     )
+   * )
    */
   public function show($id)
   {
     try {
-      $product = Product::find($id);
+      $product = $this->productService->findProductById($id);
       if (!$product) {
-        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 202);
+        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 404);
       }
+
       if ($product->isInactive()) {
-        return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id, está inactivo"], 401);
+        return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id está inactivo"], 403);
       }
+
       return response()->json(new ProductResource($product), 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
@@ -89,46 +230,127 @@ class ProductController extends Controller
   }
 
   /**
-   * Obtiene los detalles de un producto específico por su ID.
-   *
-   * @param Product $product
-   * @return \Illuminate\Http\JsonResponse
+   * @OA\Put(
+   *     path="/v2/products/{id}",
+   *     summary="Actualizar un producto existente",
+   *     tags={"Products"},
+   *     security={{"bearerAuth": {}}},
+   *     @OA\Parameter(
+   *         name="id",
+   *         in="path",
+   *         required=true,
+   *         @OA\Schema(type="integer")
+   *     ),
+   *     @OA\RequestBody(
+   *         required=true,
+   *         description="Datos para crear un nuevo producto",
+   *         @OA\JsonContent(
+   *             type="object",
+   *             required={"sku", "name", "description", "price", "iva", "active"},
+   *             @OA\Property(property="sku", type="string", example="123456", description="Código único del producto"),
+   *             @OA\Property(property="name", type="string", example="Nombre del producto", description="Nombre del producto"),
+   *             @OA\Property(property="description", type="string", example="Descripción del producto", description="Descripción del producto"),
+   *             @OA\Property(property="photo", type="string", format="uri", example="http://example.com/photo.jpg", description="URL de la foto del producto"),
+   *             @OA\Property(property="price", type="number", format="float", example=19.99, description="Precio del producto"),
+   *             @OA\Property(property="iva", type="number", format="float", example=0.19, description="Porcentaje de IVA del producto"),
+   *             @OA\Property(property="active", type="boolean", example=true, description="Estado de disponibilidad del producto")
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=200,
+   *         description="Producto creado exitosamente.",
+   *         @OA\JsonContent(
+   *            type="object",
+   *            properties={
+   *              @OA\Property(property="sku", type="string", example="123456", description="Código único del producto"),
+   *              @OA\Property(property="name", type="string", example="Nombre del producto", description="Nombre del producto"),
+   *              @OA\Property(property="description", type="string", example="Descripción del producto", description="Descripción del producto"),
+   *              @OA\Property(property="photo", type="string", format="uri", example="http://example.com/photo.jpg", description="URL de la foto del producto"),
+   *              @OA\Property(property="price", type="number", format="float", example=19.99, description="Precio del producto"),
+   *              @OA\Property(property="iva", type="number", format="float", example=0.19, description="Porcentaje de IVA del producto"),
+   *              @OA\Property(property="active", type="boolean", example=true, description="Estado de disponibilidad del producto")
+   *            }
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=404,
+   *         description="Producto no encontrado.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="info", type="string"),
+   *             @OA\Property(property="message", type="string")
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=403,
+   *         description="Producto inactivo.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="info", type="string"),
+   *             @OA\Property(property="message", type="string")
+   *         )
+   *     )
+   * )
    */
-  public function update(ProductUpdateRequest $request,  $id)
+  public function update(ProductUpdateRequest $request, $id)
   {
-    $validatedData = $request->validated(); // Validar los datos utilizando la regla definida en ProductCreateRequest
-    $product = Product::find($id);
     try {
+      $validatedData = $request->validated();
+      $product = $this->productService->findProductById($id);
+
       if (!$product) {
-        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 202);
+        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 404);
       }
+
       if ($product->isInactive()) {
-        return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id, está inactivo"], 401);
+        return response()->json(['info' => 'Inactivo', 'message' => "El producto $product->id está inactivo"], 403);
       }
-      $product->update($validatedData);
-      return response()->json(new ProductResource($product), 200);
+
+      $updatedProduct = $this->productService->updateProduct($product, $validatedData);
+      return response()->json(new ProductResource($updatedProduct), 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
     }
   }
 
   /**
-   * Obtiene los detalles de un producto específico por su ID.
-   *
-   * @param Product $product
-   * @return \Illuminate\Http\JsonResponse
+   * @OA\Delete(
+   *     path="/v2/products/{id}",
+   *     summary="Eliminar un producto específico",
+   *     tags={"Products"},
+   *     security={{"bearerAuth": {}}},
+   *     @OA\Parameter(
+   *         name="id",
+   *         in="path",
+   *         required=true,
+   *         @OA\Schema(type="integer")
+   *     ),
+   *     @OA\Response(
+   *         response=200,
+   *         description="Producto eliminado exitosamente.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="success", type="string"),
+   *             @OA\Property(property="message", type="string")
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=404,
+   *         description="Producto no encontrado.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="info", type="string"),
+   *             @OA\Property(property="message", type="string")
+   *         )
+   *     )
+   * )
    */
   public function destroy($id)
   {
     try {
-
-      $product = Product::find($id);
+      $product = $this->productService->findProductById($id);
 
       if (!$product) {
-        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 202);
+        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 404);
       }
-      return response()->json(['info' => "Warning", 'message' => $product], 202);
-      $product->delete();
+
+      $this->productService->deleteProduct($product);
       return response()->json(['success' => "Éxito", 'message' => "Successfully deleted"], 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
@@ -136,18 +358,55 @@ class ProductController extends Controller
   }
 
   /**
-   * Cambia el estado de activación de un producto.
-   *
-   * @param Product $product
-   * @param Request $request
-   * @return \Illuminate\Http\JsonResponse
+   * @OA\Put(
+   *     path="/v2/products/{id}/inactiveOrActivate",
+   *     summary="Cambiar estado de activación de un producto",
+   *     tags={"Products"},
+   *     security={{"bearerAuth": {}}},
+   *     @OA\Parameter(
+   *         name="id",
+   *         in="path",
+   *         required=true,
+   *         @OA\Schema(type="integer")
+   *     ),
+   *     @OA\RequestBody(
+   *         required=true,
+   *         @OA\JsonContent(
+   *             @OA\Property(property="active", type="boolean")
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=200,
+   *         description="Estado del producto actualizado.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="success", type="string"),
+   *             @OA\Property(property="message", type="string")
+   *         )
+   *     ),
+   *     @OA\Response(
+   *         response=404,
+   *         description="Producto no encontrado.",
+   *         @OA\JsonContent(
+   *             @OA\Property(property="info", type="string"),
+   *             @OA\Property(property="message", type="string")
+   *         )
+   *     )
+   * )
    */
-  public function inactiveOrActivate(Product $product, Request $request)
+  public function inactiveOrActivate(Request $request, $id)
   {
     try {
-      $product->active = $request->active;
-      $product->save();
-      return response()->json(['success' => "Éxito", 'message' => "Se ha cambiado exitosamente el estado del producto $product->id"], 204);
+
+      $product = $this->productService->findProductById($id);
+
+      if (!$product) {
+        return response()->json(['info' => "Warning", 'message' => "Product does not exist"], 404);
+      }
+
+      $status = $request->input('active');
+      $this->productService->toggleProductStatus($product, $status);
+
+      return response()->json(['success' => "Éxito", 'message' => "Estado del producto actualizado"], 200);
     } catch (\Exception $ex) {
       return $this->handleException($ex);
     }

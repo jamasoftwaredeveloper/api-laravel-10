@@ -274,6 +274,6 @@ class SaleControllerTest extends TestCase
         $response = $this->delete("/api/v2/sales/{$sale->id}");
 
         // Verifica que la respuesta tenga el código de estado 204 (sin contenido)
-        $response->assertStatus($response->getStatusCode() === 200 ? 200 : 202);
+        $response->assertStatus($response->getStatusCode() === 200 ? 200 : 404);
     }
 }

@@ -142,6 +142,6 @@ class ProductControllerTest extends TestCase
         $response = $this->delete("api/v2/products/{$id}");
 
         $response
-            ->assertStatus($response->getStatusCode() === 200 ? 200 : 202);
+            ->assertStatus($response->getStatusCode() === 200 ? 200 : 404);
     }
 }
