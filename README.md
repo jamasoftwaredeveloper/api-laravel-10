@@ -15,6 +15,10 @@ php artisan migrate:fresh --seed --env=testing
 # Ejecución de pruebas 
 php artisan test
 
+Usuario existente.
+Usuario: test@example.com
+Contraseña: 0713
+
 //.........................................DOCUMENTACIÓN API............................................//
 
 # Autenticación.
