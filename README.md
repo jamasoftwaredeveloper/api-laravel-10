@@ -87,6 +87,7 @@ curl -X DELETE {domain}/api/products/{id} -H 'Accept: application/json'
 
 
 .................................................DOCKER............................................
+
 Instalar docker.
 Abrir docker.
 
