@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\NotifyJob;
+use App\Jobs\ProcessDataJob;
 use App\Models\v1\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -103,6 +105,10 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        NotifyJob::dispatch();
+           
+        // Despachar el trabajo a la cola
+        ProcessDataJob::dispatch("Cola ejecutada");
 
         $request->validate([
             'email' => 'required|string|email',
