@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Repositories\SaleRepository;
+use App\Repositories\Interfaces\SaleRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -10,7 +10,7 @@ class SaleService
 {
     protected $saleRepository;
 
-    public function __construct(SaleRepository $saleRepository)
+    public function __construct(SaleRepositoryInterface $saleRepository)
     {
         $this->saleRepository = $saleRepository;
     }
@@ -24,7 +24,7 @@ class SaleService
     {
         DB::beginTransaction();
         try {
-           
+
             $sale = $this->saleRepository->createSale($saleData);
             $this->saleRepository->attachProducts($sale, $products);
             DB::commit();
@@ -68,7 +68,7 @@ class SaleService
         if (!$sale) {
             return null;
         }
-        
+
         return $this->saleRepository->deleteSale($sale);
     }
 }

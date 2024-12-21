@@ -3,9 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\v1\Sale;
-use App\Models\v1\ProductSale;
+use App\Repositories\Interfaces\SaleRepositoryInterface;
 
-class SaleRepository
+
+class SaleRepository implements SaleRepositoryInterface
 {
     public function getAllSales($order, $page)
     {
@@ -34,13 +35,13 @@ class SaleRepository
     }
 
     public function attachProducts(Sale $sale, array $products)
-    {  
-      
+    {
+
         foreach ($products as $productData) {
             $sale->products()->attach([
                 $productData['id'] => ['quantity' =>  $productData['quantity']]
             ]);
         }
-   
+
     }
 }

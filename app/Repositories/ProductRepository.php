@@ -3,8 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\v1\Product;
+use App\Repositories\Interfaces\ProductRepositoryInterface;
 
-class ProductRepository
+class ProductRepository implements ProductRepositoryInterface
 {
     public function getAllActive($order, $page)
     {
